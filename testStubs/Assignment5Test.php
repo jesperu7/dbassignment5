@@ -95,6 +95,10 @@ class Assignment5Test extends \Codeception\Test\Unit
     {
         $skiers = $this->model->getSkiers();
         $skier = $skiers[15];
+	      	$this->assertEquals('bror_kals', $skier->userName);
+      		$this->assertEquals(1, sizeOf($skier->yearlyDistances));
+      		$this->assertEquals(2016, $skier->yearlyDistances[0]->season);
+      		$this->assertEquals(202, $skier->yearlyDistances[0]->distance);
 
         // Verify that this skier has user name bror_kals
         // That the user has logged skiing distances in one year only
@@ -110,6 +114,12 @@ class Assignment5Test extends \Codeception\Test\Unit
     {
         $skiers = $this->model->getSkiers();
         $skier = $skiers[0];
+	      	$this->assertEquals('ande_andr', $skier->userName);
+		      $this->assertEquals(2, sizeOf($skier->yearlyDistances));
+		      $this->assertEquals(2015, $skier->yearlyDistances[0]->season);
+		      $this->assertEquals(23, $skier->yearlyDistances[0]->distance);
+		      $this->assertEquals(2016, $skier->yearlyDistances[1]->season);
+		      $this->assertEquals(55, $skier->yearlyDistances[1]->distance);
 
         // Verify that this skier has user name ande_andr
         // That the user has logged skiing distances in two different years
