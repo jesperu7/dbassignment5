@@ -11,6 +11,8 @@ require_once('Skier.php');
 require_once('YearlyDistance.php');
 require_once('Affiliation.php');
 
+
+
 /**
   * The class for accessing skier logs stored in the XML file
   */  
@@ -28,6 +30,9 @@ class XmlSkierLogs
     {
         $this->doc = new DOMDocument();
         $this->doc->load($url);
+		//$root = $this->doc->documentElement;
+		
+		$this->xpath = new DOMXpath($this->doc);
     }
     
     /**
@@ -38,6 +43,26 @@ class XmlSkierLogs
     public function getClubs()
     {
         $clubs = array();
+		
+		$elements = $this->xpath->query('/SkierLogs/Clubs/Club');
+		
+		foreach($elements as $element){
+			$xElement = $element->getElementsByTagName("Name");
+			$valueOfName = $xElement->item(0)->nodeValue;
+			
+			$xElement = $element->getElementsByTagName("City");
+			$valueOfCity = $xElement->item(0)->nodeValue;
+			
+			$xElement = $element->getElementsByTagName("County");
+			$valueOfCounty = $xElement->item(0)->nodeValue;
+			
+			$nodeID = $element->getAttribute('id');
+			
+			$tmp = new Club($nodeID, $valueOfName, $valueOfCity, $valueOfCounty);
+			array_push($clubs, $tmp);
+			
+		}
+		
         
         // TODO: Implement the function retrieving club information
         return $clubs;
@@ -53,6 +78,50 @@ class XmlSkierLogs
     {
         $skiers = array();
     
+	$elements = $this->xpath->query('/SkierLogs/Skiers/Skier');
+		
+		foreach($elements as $element){
+			$xElement = $element->getElementsByTagName("FirstName");
+			$valueOfFName = $xElement->item(0)->nodeValue;
+			
+			$xElement = $element->getElementsByTagName("LastName");
+			$valueOfLName = $xElement->item(0)->nodeValue;
+			
+			$xElement = $element->getElementsByTagName("YearOfBirth");
+			$valueOfBirthyear = $xElement->item(0)->nodeValue;
+			
+			$nodeuserName = $element->getAttribute('userName');
+		
+			$tmp = new Skier($nodeuserName, $valueOfFName, $valueOfLName, $valueOfBirthyear);
+			
+			$seasons = $this->xpath->query('/SkierLogs/Season');
+			
+			foreach ($seasons as $season) { 
+				foreach ($season->getElementsByTagName("Skiers") as $affiliationElement) { 
+       
+					foreach ($affiliationElement->getElementsByTagName("Skier") as $skierElement) { 
+						if ($skierElement->getAttribute('userName') == $nodeuserName){
+							$affiliation = new Affiliation($affiliationElement->getAttribute('clubId'), $season->getAttribute('fallYear'));
+							$tmp->addAffiliation($affiliation);
+                
+               
+							foreach($skierElement->getElementsByTagName('Log') as $log) { 
+								$distance = array();
+                    
+								foreach ($log->getElementsByTagName('Entry') as $entry) { 
+									$xmlDistance = $entry->getElementsByTagName("Distance");
+									$distance[] = $xmlDistance->item(0)->nodeValue;
+								}
+							}
+                
+							$tmp->addYearlyDistance($season->getAttribute,('fallYear')array_sum($distance)); 
+						}
+					}
+				}
+			}
+			
+			array_push($skiers, $tmp);
+		}
         // TODO: Implement the function retrieving skier information,
         //       including affiliation history and logged yearly distances.
         return $skiers;
