@@ -44,11 +44,11 @@ class XmlSkierLogs
     {
         $clubs = array();
 		
-		$elements = $this->xpath->query('/SkierLogs/Clubs/Club');
+		$elements = $this->xpath->query('/SkierLogs/Clubs/Club');	//Gets list of elements with xPath
 		
-		foreach($elements as $element){
-			$xElement = $element->getElementsByTagName("Name");
-			$valueOfName = $xElement->item(0)->nodeValue;
+		foreach($elements as $element){	//Loops through all elements
+			$xElement = $element->getElementsByTagName("Name");		//Looks for "name" nodes
+			$valueOfName = $xElement->item(0)->nodeValue;			//saves value of node
 			
 			$xElement = $element->getElementsByTagName("City");
 			$valueOfCity = $xElement->item(0)->nodeValue;
@@ -56,10 +56,10 @@ class XmlSkierLogs
 			$xElement = $element->getElementsByTagName("County");
 			$valueOfCounty = $xElement->item(0)->nodeValue;
 			
-			$nodeID = $element->getAttribute('id');
+			$nodeID = $element->getAttribute('id');	// Gets value of element attribute
 			
-			$tmp = new Club($nodeID, $valueOfName, $valueOfCity, $valueOfCounty);
-			array_push($clubs, $tmp);
+			$tmp = new Club($nodeID, $valueOfName, $valueOfCity, $valueOfCounty);	//creates a temporary Club object
+			array_push($clubs, $tmp);	//adds object to array
 			
 		}
 		
@@ -78,11 +78,11 @@ class XmlSkierLogs
     {
         $skiers = array();
     
-	$elements = $this->xpath->query('/SkierLogs/Skiers/Skier');
+	$elements = $this->xpath->query('/SkierLogs/Skiers/Skier');	//Gets list of elements with xPath
 		
-		foreach($elements as $element){
-			$xElement = $element->getElementsByTagName("FirstName");
-			$valueOfFName = $xElement->item(0)->nodeValue;
+		foreach($elements as $element){ //Loops through all elements
+			$xElement = $element->getElementsByTagName("FirstName"); //Looks for "FirstName" nodes
+			$valueOfFName = $xElement->item(0)->nodeValue;	//saves value of node
 			
 			$xElement = $element->getElementsByTagName("LastName");
 			$valueOfLName = $xElement->item(0)->nodeValue;
@@ -90,37 +90,37 @@ class XmlSkierLogs
 			$xElement = $element->getElementsByTagName("YearOfBirth");
 			$valueOfBirthyear = $xElement->item(0)->nodeValue;
 			
-			$nodeuserName = $element->getAttribute('userName');
+			$nodeuserName = $element->getAttribute('userName'); // Gets value of element attribute
 		
-			$tmp = new Skier($nodeuserName, $valueOfFName, $valueOfLName, $valueOfBirthyear);
+			$tmp = new Skier($nodeuserName, $valueOfFName, $valueOfLName, $valueOfBirthyear);	//creates a temporary Skier object
 			
-			$seasons = $this->xpath->query('/SkierLogs/Season');
+			$seasons = $this->xpath->query('/SkierLogs/Season');	//Gets lists of Season elements
 			
-			foreach ($seasons as $season) { 
-				foreach ($season->getElementsByTagName("Skiers") as $affiliationElement) { 
+			foreach ($seasons as $season) { //loops through seasons
+				foreach ($season->getElementsByTagName("Skiers") as $aElement) { //loops through skiers
        
-					foreach ($affiliationElement->getElementsByTagName("Skier") as $skierElement) { 
-						if ($skierElement->getAttribute('userName') == $nodeuserName){
-							$affiliation = new Affiliation($affiliationElement->getAttribute('clubId'), $season->getAttribute('fallYear'));
-							$tmp->addAffiliation($affiliation);
-                
-               
-							foreach($skierElement->getElementsByTagName('Log') as $log) { 
+					foreach ($aElement->getElementsByTagName("Skier") as $skierElement) { //loops through skier
+						if ($skierElement->getAttribute('userName') == $nodeuserName){	//finds correct user
+							if($aElement->hasAttribute('clubId')){	//excludes user if it's not in a club
+								$affiliation = new Affiliation($aElement->getAttribute('clubId'), $season->getAttribute('fallYear'));	//creates temporary affiliation object
+								$tmp->addAffiliation($affiliation);	//adds affiliation to the temporary skier object
+							}
+							foreach($skierElement->getElementsByTagName('Log') as $log) { // loops thorug the logs
 								$distance = array();
                     
-								foreach ($log->getElementsByTagName('Entry') as $entry) { 
-									$xmlDistance = $entry->getElementsByTagName("Distance");
-									$distance[] = $xmlDistance->item(0)->nodeValue;
+								foreach ($log->getElementsByTagName('Entry') as $entry) { //loops through entrys
+									$xDistance = $entry->getElementsByTagName("Distance");	//gets distance node
+									$distance[] = $xDistance->item(0)->nodeValue;	//adds value of node to an array
 								}
 							}
                 
-							$tmp->addYearlyDistance($season->getAttribute,('fallYear')array_sum($distance)); 
+							$tmp->addYearlyDistance($tmpSeason = new YearlyDistance($season->getAttribute('fallYear'),array_sum($distance))); //adds distance to skier object
 						}
 					}
 				}
 			}
 			
-			array_push($skiers, $tmp);
+			array_push($skiers, $tmp);	//pushes skier to the array
 		}
         // TODO: Implement the function retrieving skier information,
         //       including affiliation history and logged yearly distances.
