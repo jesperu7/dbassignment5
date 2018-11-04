@@ -11,6 +11,8 @@ require_once('Skier.php');
 require_once('YearlyDistance.php');
 require_once('Affiliation.php');
 
+
+
 /**
   * The class for accessing skier logs stored in the XML file
   */  
@@ -28,6 +30,9 @@ class XmlSkierLogs
     {
         $this->doc = new DOMDocument();
         $this->doc->load($url);
+		//$root = $this->doc->documentElement;
+		
+		$this->xpath = new DOMXpath($this->doc);
     }
     
     /**
@@ -38,6 +43,26 @@ class XmlSkierLogs
     public function getClubs()
     {
         $clubs = array();
+		
+		$elements = $this->xpath->query('/SkierLogs/Clubs/Club');
+		
+		foreach($elements as $element){
+			$xElement = $element->getElementsByTagName("Name");
+			$valueOfName = $xElement->item(0)->nodeValue;
+			
+			$xElement = $element->getElementsByTagName("City");
+			$valueOfCity = $xElement->item(0)->nodeValue;
+			
+			$xElement = $element->getElementsByTagName("County");
+			$valueOfCounty = $xElement->item(0)->nodeValue;
+			
+			$nodeID = $element->getAttribute('id');
+			
+			$tmp = new Club($nodeID, $valueOfName, $valueOfCity, $valueOfCounty);
+			array_push($clubs, $tmp);
+			
+		}
+		
         
         // TODO: Implement the function retrieving club information
         return $clubs;
