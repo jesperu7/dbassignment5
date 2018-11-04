@@ -100,7 +100,7 @@ class XmlSkierLogs
 				foreach ($season->getElementsByTagName("Skiers") as $affiliationElement) { 
        
 					foreach ($affiliationElement->getElementsByTagName("Skier") as $skierElement) { 
-						if ($skierElement->getAttribute('userName') == $element->getAttribute('userName')){
+						if ($skierElement->getAttribute('userName') == $nodeuserName){
 							$affiliation = new Affiliation($affiliationElement->getAttribute('clubId'), $season->getAttribute('fallYear'));
 							$tmp->addAffiliation($affiliation);
                 
@@ -114,7 +114,7 @@ class XmlSkierLogs
 								}
 							}
                 
-							$tmp->addYearlyDistance(array_sum($distance), $season->getAttribute('fallYear')); 
+							$tmp->addYearlyDistance($season->getAttribute,('fallYear')array_sum($distance)); 
 						}
 					}
 				}
